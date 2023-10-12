@@ -1,0 +1,17 @@
+{
+  "name": "aalto-cocktail-bot",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "google-auth-library": "^9.1.0",
+    "google-spreadsheet": "^4.1.0",
+    "grammy": "^1.19.1",
+    "node-html-parser": "^6.1.10"
+  }
+}
