@@ -78,6 +78,11 @@ export default class JoinHandler {
     return rows.find((row) => row.get("username") === username);
   }
 
+  async findIncomplete(id: number) {
+    const rows = await this.incompleteSheet.getRows<IncompleteRowData>();
+    return rows.find((row) => parseInt(row.get("id")) === id);
+  }
+
   async preapprove(ctx: Context, username: string) {
     if (ctx.from?.username) {
       const preapproved = await this.findPreapproved(username);
@@ -115,8 +120,7 @@ export default class JoinHandler {
         delete this.attempts[attempt.id];
         const preapproved = await this.findPreapproved(username);
         if (preapproved) await preapproved.delete();
-        const incompleteRows = await this.incompleteSheet.getRows<IncompleteRowData>();
-        const incompleteRow = incompleteRows.find((row) => parseInt(row.get("id")) === id);
+        const incompleteRow = await this.findIncomplete(id);
         if (incompleteRow) await incompleteRow.delete();
         ctx.reply(`@${username} is now a member!`);
       } else {
@@ -349,8 +353,8 @@ class JoinAttempt {
 
   // should probably not call this at every step since there's probably a call limit on the Sheets API
   async saveIncomplete() {
-    const rows = await this.joinHandler.incompleteSheet.getRows<IncompleteRowData>();
-    const row = rows.find((row) => parseInt(row.get("id")) === this.id);
+    if (!this.id) return;
+    const row = await this.joinHandler.findIncomplete(this.id);
     if (row) await row.delete();
     const data: { [key: string]: any } = {
       step: this.step,
