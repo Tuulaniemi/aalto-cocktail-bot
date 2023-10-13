@@ -56,11 +56,15 @@ async function findActive(id: number) {
   return rows.find((row) => parseInt(row.get("id")) === id);
 }
 
+async function checkPrivate(ctx: Context) {
+  return (await ctx.getChat()).type === "private";
+}
+
 // this is only used for the /confirm command at the moment
 const waitingForResponse: { [id: string]: string } = {};
 
 bot.command("start", async (ctx) => {
-  if (ctx.from?.username) {
+  if (await checkPrivate(ctx) && ctx.from?.username) {
     const row = await findByTelegram(ctx.from?.username);
     if (row) {
       ctx.reply(`Hello ${ctx.from?.first_name}! I see you are already a member! You can use the /events command to see upcoming events or you can join the AC Community group here: ${process.env.AC_COMMUNITY_GROUP}`);
@@ -72,7 +76,7 @@ bot.command("start", async (ctx) => {
 });
 
 bot.command("join", async (ctx) => {
-  if (ctx.chat.id !== activeChatId) {
+  if (await checkPrivate(ctx) && ctx.chat.id !== activeChatId) {
     startJoin(ctx);
   }
 });
@@ -80,7 +84,7 @@ bot.command("join", async (ctx) => {
 // this is kind of pointless at the moment since the Sheets file only includes new members who joined using the bot
 bot.command("check", async (ctx) => {
   const username = ctx.message?.text?.split("/check ")[1];
-  if (username && ctx.from?.id && await findActive(ctx.from.id)) {
+  if (await checkPrivate(ctx) && username && ctx.from?.id && await findActive(ctx.from.id)) {
     if (await check(username)) {
       ctx.reply(`@${username} is a member.`);
     } else {
@@ -111,7 +115,7 @@ async function confirm(ctx: Context, username: string) {
 
 bot.command("confirm", async (ctx) => {
   let username = ctx.message?.text?.split("/confirm ")[1];
-  if (ctx.from?.id && await findActive(ctx.from.id)) {
+  if (await checkPrivate(ctx) && ctx.from?.id && await findActive(ctx.from.id)) {
     if (username) {
       confirm(ctx, username);
     } else {
@@ -134,7 +138,7 @@ bot.command("confirm", async (ctx) => {
 
 // only used for cancelling the /confirm command at the moment
 bot.command("cancel", async (ctx) => {
-  if (ctx.from?.id && waitingForResponse[ctx.from.id]) {
+  if (await checkPrivate(ctx) && ctx.from?.id && waitingForResponse[ctx.from.id]) {
     delete waitingForResponse[ctx.from.id];
     ctx.reply("Cancelled!", { reply_markup: { remove_keyboard: true } });
   }
