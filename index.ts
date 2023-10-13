@@ -1,6 +1,6 @@
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
-import { Bot, Context, Keyboard } from "grammy";
+import { Bot, Context, InputFile, Keyboard } from "grammy";
 import EventHandler from "./EventHandler";
 import JoinHandler from "./JoinHandler";
 
@@ -78,6 +78,14 @@ bot.command("start", async (ctx) => {
 bot.command("join", async (ctx) => {
   if (await checkPrivate(ctx) && ctx.chat.id !== activeChatId) {
     startJoin(ctx);
+  }
+});
+
+
+bot.command("download", async (ctx) => {
+  if (await checkPrivate(ctx) && ctx.from?.id && await findActive(ctx.from.id)) {
+    const xlsxBuffer = await doc.downloadAsXLSX();
+    ctx.replyWithDocument(new InputFile(Buffer.from(xlsxBuffer), "sheet.xlsx"));
   }
 });
 
