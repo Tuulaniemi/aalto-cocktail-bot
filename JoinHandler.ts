@@ -48,7 +48,7 @@ export default class JoinHandler {
             lastName: row.get("lastName") && row.get("lastName").length > 0 ? row.get("lastName") : null,
             email: row.get("email") && row.get("email").length > 0 ? row.get("email") : null,
             city: row.get("city") && row.get("city").length > 0 ? row.get("city") : null,
-            ayyMember: row.get("ayyMember") === true || row.get("ayyMember") === false ? row.get("ayyMember") : null,
+            ayyMember: row.get("ayyMember") === "TRUE" ? true : row.get("ayyMember") === "FALSE" ? false : undefined,
             school: row.get("school") && row.get("school").length > 0 ? row.get("school") : null
           }
           this.attempts[row.get("id")] = new JoinAttempt(null, this, data);
@@ -101,6 +101,7 @@ export default class JoinHandler {
     const attempt = Object.values(this.attempts).find((attempt) => attempt.username === username);
     if (attempt && attempt.id) {
       const { id, firstName, lastName, email, ayyMember, school, city } = attempt;
+      console.log(id, firstName, lastName, email, ayyMember, school, city, username)
       if (id && username && firstName && lastName && email && city && ayyMember !== null && (ayyMember === false || school !== null)) {
         let data: { [name: string]: string | number | boolean | Date } = {
           id,
@@ -340,6 +341,10 @@ class JoinAttempt {
           } else {
             ctx.reply("Please choose one of the options.");
           }
+          break;
+
+        case "done":
+          this.done(ctx);
           break;
 
       }
