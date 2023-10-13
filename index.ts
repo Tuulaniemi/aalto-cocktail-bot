@@ -89,6 +89,18 @@ bot.command("download", async (ctx) => {
   }
 });
 
+// only for testing purposes
+bot.command("deletemember", async (ctx) => {
+  if (await checkPrivate(ctx) && ctx.from?.id && await findActive(ctx.from.id)) {
+    const username = ctx.message?.text?.split("/deletemember ")[1];
+    const row = await findByTelegram(username);
+    if (row) {
+      await row.delete();
+      ctx.reply(`Deleted @${username}!`);
+    }
+  }
+});
+
 // this is kind of pointless at the moment since the Sheets file only includes new members who joined using the bot
 bot.command("check", async (ctx) => {
   const username = ctx.message?.text?.split("/check ")[1];
