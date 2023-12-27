@@ -237,7 +237,7 @@ bot.on("message", async (ctx) => {
       joinHandler.onMessage(ctx);
     } else {
       if (await check(ctx.from?.username || "")) {
-        ctx.reply("Sorry, I didn't understand that. You can use the /join command to become a member or /events to see upcoming events.", { reply_markup: { remove_keyboard: true } })
+        //ctx.reply("Sorry, I didn't understand that. You can use the /join command to become a member or /events to see upcoming events.", { reply_markup: { remove_keyboard: true } })
       } else {
         if (ctx.message?.text === "Yes") {
           startJoin(ctx);
